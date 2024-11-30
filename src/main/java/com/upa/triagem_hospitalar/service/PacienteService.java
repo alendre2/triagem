@@ -50,10 +50,14 @@ public class PacienteService {
     public PacienteResponseDto atualizarPaciente(Long id, PacienteRequestDto pacienteRequestDto) {
         return pacienteRepository.findById(id)
                 .map(paciente ->{
+                    String nomeAntigo = paciente.getNome();
                     paciente.setNome(pacienteRequestDto.nome());
                     paciente.setPreferencial(pacienteRequestDto.preferencial());
                     Paciente pacienteAtualizado = pacienteRepository.save(paciente);
+
+                    filaTriagem.removerPaciente(nomeAntigo);
                     filaTriagem.atualizarPaciente(mapStruct.converterDtoParaPaciente(pacienteRequestDto).getNome(), paciente);
+
                     return mapStruct.converterParaResponseDto(pacienteAtualizado);
                 }).orElseThrow(() -> new PacienteNaoEncontradoException("Não foi possivel atualizar, paciente não identificado. Id"+ id  ));
     }
