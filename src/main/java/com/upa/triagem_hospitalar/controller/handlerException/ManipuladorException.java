@@ -1,6 +1,7 @@
 package com.upa.triagem_hospitalar.controller.handlerException;
 
 import com.upa.triagem_hospitalar.exception.FilaDeAtendimentoVaziaException;
+import com.upa.triagem_hospitalar.exception.PacienteJaExisteException;
 import com.upa.triagem_hospitalar.exception.PacienteNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,14 @@ public class ManipuladorException {
     public ResponseEntity<PadraoDeErro> filadeAtendimentoVaziaException(FilaDeAtendimentoVaziaException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         String erro = "Fila de Atendimento vazia.";
+        PadraoDeErro padraoDeErro = new PadraoDeErro(LocalDateTime.now(), status.value(), erro, e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(padraoDeErro);
+    }
+
+    @ExceptionHandler(PacienteJaExisteException.class)
+    public  ResponseEntity<PadraoDeErro> pacienteJaExisteException(PacienteJaExisteException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        String erro = "Paciente ja existe.";
         PadraoDeErro padraoDeErro = new PadraoDeErro(LocalDateTime.now(), status.value(), erro, e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(padraoDeErro);
     }

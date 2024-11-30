@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import com.upa.triagem_hospitalar.dto.requestDto.PacienteRequestDto;
 import com.upa.triagem_hospitalar.dto.responseDto.PacienteResponseDto;
+import com.upa.triagem_hospitalar.exception.PacienteJaExisteException;
+import com.upa.triagem_hospitalar.fila.PacienteFila;
 import com.upa.triagem_hospitalar.mapStruct.PacienteMapStruct;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,12 @@ public class PacienteService {
     @Transactional
     public PacienteResponseDto adicionarPaciente(PacienteRequestDto pacienteRequestDto) {
         Paciente paciente = mapStruct.converterDtoParaPaciente(pacienteRequestDto);
+
+        boolean existePaciente = pacienteRepository.existsByNome(paciente.getNome());
+
+        if(existePaciente){
+            throw new PacienteJaExisteException("Já existe um paciente com o nome " + paciente.getNome());
+        }
         pacienteRepository.save(paciente);
         filaTriagem.inserePaciente(paciente);
         return mapStruct.converterParaResponseDto(paciente);
@@ -45,6 +53,7 @@ public class PacienteService {
                     paciente.setNome(pacienteRequestDto.nome());
                     paciente.setPreferencial(pacienteRequestDto.preferencial());
                     Paciente pacienteAtualizado = pacienteRepository.save(paciente);
+                    filaTriagem.atualizarPaciente(mapStruct.converterDtoParaPaciente(pacienteRequestDto).getNome(), paciente);
                     return mapStruct.converterParaResponseDto(pacienteAtualizado);
                 }).orElseThrow(() -> new PacienteNaoEncontradoException("Não foi possivel atualizar, paciente não identificado. Id"+ id  ));
     }

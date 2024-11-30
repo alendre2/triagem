@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.upa.triagem_hospitalar.entity.Paciente;
+import com.upa.triagem_hospitalar.exception.PacienteJaExisteException;
 
 public class Lista {
   
@@ -53,6 +54,16 @@ public class Lista {
         }
 
         return null;
+    }
+
+    public void atualizarPaciente(String nome, Paciente pacienteNovo) {
+        removerPaciente(nome);
+        if (!nome.equals(pacienteNovo.getNome()) && buscarPaciente(pacienteNovo.getNome()) != null) {
+            throw new PacienteJaExisteException("Paciente com o mesmo nome já existe na fila.");
+
+        }
+        inserePaciente(pacienteNovo);
+
     }
 
     public Paciente removerPrimeiro() {

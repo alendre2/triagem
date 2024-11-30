@@ -16,5 +16,7 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     @Query("SELECT u FROM Paciente u WHERE LOWER(u.nome) LIKE LOWER(CONCAT('%', :nome, '%'))")
     List<Paciente> findByNomeContainingIgnoreCase(@Param("nome")String nome);
+
+    boolean existsByNome(String nome);
 }
 
