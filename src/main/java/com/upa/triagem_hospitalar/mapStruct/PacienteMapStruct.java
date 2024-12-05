@@ -10,15 +10,11 @@ import org.mapstruct.MappingConstants;
 
 import java.util.List;
 
-@Mapper(
-        componentModel = MappingConstants.ComponentModel.SPRING,
-        unmappedTargetPolicy = ReportingPolicy.ERROR
-)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface PacienteMapStruct {
 
-    PacienteRequestDto converterParaRequestDto(Paciente paciente);
-
-    @Mapping(target = "id", ignore = true) // Ignora o ID ao criar uma nova entidade
+    @Mapping(target = "id", ignore = true)
     Paciente converterDtoParaPaciente(PacienteRequestDto pacienteRequestDto);
 
     PacienteResponseDto converterParaResponseDto(Paciente paciente);

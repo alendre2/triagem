@@ -1,18 +1,23 @@
 package com.upa.triagem_hospitalar.controller;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.upa.triagem_hospitalar.dto.requestDto.PacienteRequestDto;
 import com.upa.triagem_hospitalar.dto.responseDto.PacienteResponseDto;
+import com.upa.triagem_hospitalar.service.PacienteService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.upa.triagem_hospitalar.entity.Paciente;
-import com.upa.triagem_hospitalar.service.PacienteService;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pacientes")
@@ -20,7 +25,6 @@ import com.upa.triagem_hospitalar.service.PacienteService;
 public class PacienteController {
 
     private final PacienteService pacienteService;
-
 
     public PacienteController(PacienteService pacienteService) {
         this.pacienteService = pacienteService;
@@ -32,12 +36,12 @@ public class PacienteController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<PacienteResponseDto> atualizar (@PathVariable Long id,@Valid @RequestBody PacienteRequestDto pacienteRequestDto){
-        return ResponseEntity.status(HttpStatus.OK).body(pacienteService.atualizarPaciente(id,pacienteRequestDto));
+    public ResponseEntity<PacienteResponseDto> atualizar(@PathVariable Long id, @Valid @RequestBody PacienteRequestDto pacienteRequestDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(pacienteService.atualizarPaciente(id, pacienteRequestDto));
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deletarPaciente(@PathVariable Long id){
+    public ResponseEntity<Void> deletarPaciente(@PathVariable Long id) {
         pacienteService.deletarPaciente(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -45,7 +49,7 @@ public class PacienteController {
     @GetMapping(value = "/{id}")
     public ResponseEntity<PacienteResponseDto> buscarPacientePorId(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(pacienteService.buscarPacientePorId(id));
-   }
+    }
 
     @GetMapping
     public ResponseEntity<List<PacienteResponseDto>> listarPacientes(@RequestParam(value = "nome", required = false) String nome) {
@@ -57,7 +61,7 @@ public class PacienteController {
     }
 
     @GetMapping("/triagem")
-    public ResponseEntity<List<PacienteResponseDto>> listarFila(){
+    public ResponseEntity<List<PacienteResponseDto>> listarFila() {
         return ResponseEntity.status(HttpStatus.OK).body(pacienteService.listarFila());
     }
 

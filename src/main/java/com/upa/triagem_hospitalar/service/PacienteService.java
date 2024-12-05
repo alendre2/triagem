@@ -17,40 +17,34 @@ import java.util.List;
 @Service
 public class PacienteService {
 
-    private final PacienteRepository pacienteRepository;
+    private final PacienteRepository repository;
     private final PacienteMapStruct mapStruct;
     private final Lista filaTriagem;
 
-    public PacienteService(PacienteRepository pacienteRepository, PacienteMapStruct mapStruct, Lista filaTriagem) {
-        this.pacienteRepository = pacienteRepository;
+    public PacienteService(PacienteRepository repository, PacienteMapStruct mapStruct, Lista filaTriagem) {
+        this.repository = repository;
         this.mapStruct = mapStruct;
         this.filaTriagem = filaTriagem;
     }
 
-
     @Transactional
     public PacienteResponseDto adicionarPaciente(PacienteRequestDto pacienteRequestDto) {
         Paciente paciente = mapStruct.converterDtoParaPaciente(pacienteRequestDto);
+        verificarSePacienteExiste(paciente);
 
-        boolean existePaciente = pacienteRepository.existsByNome(paciente.getNome());
-
-        if (existePaciente) {
-            throw new PacienteJaExisteException("Já existe um paciente com o nome " + paciente.getNome());
-        }
-        pacienteRepository.save(paciente);
+        repository.save(paciente);
         filaTriagem.inserePaciente(paciente);
         return mapStruct.converterParaResponseDto(paciente);
-
     }
 
     @Transactional
     public PacienteResponseDto atualizarPaciente(Long id, PacienteRequestDto pacienteRequestDto) {
-        return pacienteRepository.findById(id)
+        return repository.findById(id)
                 .map(paciente -> {
                     String nomeAntigo = paciente.getNome();
                     paciente.setNome(pacienteRequestDto.nome());
                     paciente.setPreferencial(pacienteRequestDto.preferencial());
-                    Paciente pacienteAtualizado = pacienteRepository.save(paciente);
+                    Paciente pacienteAtualizado = repository.save(paciente);
 
                     filaTriagem.removerPaciente(nomeAntigo);
                     filaTriagem.atualizarPaciente(mapStruct.converterDtoParaPaciente(pacienteRequestDto).getNome(), paciente);
@@ -61,29 +55,34 @@ public class PacienteService {
 
     @Transactional
     public void deletarPaciente(long id) {
-        Paciente paciente = pacienteRepository.findById(id).orElseThrow(() ->
+        Paciente paciente = repository.findById(id).orElseThrow(() ->
                 new PacienteNaoEncontradoException("Não foi possivel deletar! Paciente não identificado. Id" + id));
         filaTriagem.removerPaciente(paciente.getNome());
-        pacienteRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
     public PacienteResponseDto buscarPacientePorId(Long id) {
-        Paciente paciente = pacienteRepository.findById(id)
-                .orElseThrow(() -> new PacienteNaoEncontradoException("Paciente não encontrado. Id" + id));
-        return mapStruct.converterParaResponseDto(paciente);
+        return mapStruct.converterParaResponseDto(repository.findById(id).orElseThrow(() -> new PacienteNaoEncontradoException("Paciente não encontrado. Id" + id)));
     }
 
     public List<PacienteResponseDto> listarPacientes() {
-        return mapStruct.converterListParaResponseDto(pacienteRepository.findAll());
+        return mapStruct.converterListParaResponseDto(repository.findAll());
     }
 
 
     public List<PacienteResponseDto> buscarPacientePorNome(String nome) {
-        return mapStruct.converterListParaResponseDto(pacienteRepository.findByNome(nome));
+        return mapStruct.converterListParaResponseDto(repository.findByNome(nome));
     }
 
     public List<PacienteResponseDto> listarFila() {
         return mapStruct.converterListParaResponseDto(filaTriagem.toList());
+    }
+
+    //Metodo auxiliar
+    public void verificarSePacienteExiste(Paciente paciente) {
+        if (repository.existsByNome(paciente.getNome())) {
+            throw new PacienteJaExisteException("Já existe um paciente com o nome " + paciente.getNome());
+        }
     }
 
     // Chamar o próximo paciente da fila de triagem
