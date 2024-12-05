@@ -61,12 +61,12 @@ public class PacienteController {
         return ResponseEntity.ok().body(pacienteService.listarPorNome(nome));
     }
 
-    @GetMapping("/triagem")
+    @GetMapping(value = "/triagem")
     public ResponseEntity<List<PacienteResponseDto>> listarFila() {
         return ResponseEntity.status(HttpStatus.OK).body(pacienteService.listarFila());
     }
 
-    @GetMapping("/proximo")
+    @GetMapping(value = "/proximo")
     public ResponseEntity<PacienteResponseDto> proximoPaciente() {
         return ResponseEntity.status(HttpStatus.OK).body(pacienteService.proximoPaciente());
     }

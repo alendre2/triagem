@@ -81,6 +81,7 @@ public class PacienteService {
     // Chamar o próximo paciente da fila de triagem
     public PacienteResponseDto proximoPaciente() {
         Paciente proximo = filaTriagem.removerPrimeiro();
+        repository.delete(proximo);
         if (proximo == null) {
             throw new FilaDeAtendimentoVaziaException("Fila de atendimento vazia.");
         }
