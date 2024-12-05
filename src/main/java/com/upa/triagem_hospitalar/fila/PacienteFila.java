@@ -32,7 +32,4 @@ public class PacienteFila {
 	public void setProximo(PacienteFila proximo) {
 		this.proximo = proximo;
 	}
-	
-	
-	
 }

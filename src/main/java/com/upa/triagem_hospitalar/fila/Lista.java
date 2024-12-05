@@ -1,22 +1,36 @@
 package com.upa.triagem_hospitalar.fila;
 
+import com.upa.triagem_hospitalar.entity.Paciente;
+import com.upa.triagem_hospitalar.exception.PacienteJaExisteException;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.upa.triagem_hospitalar.entity.Paciente;
-import com.upa.triagem_hospitalar.exception.PacienteJaExisteException;
-
+@Component
 public class Lista {
-  
+
     private PacienteFila primeiro;
 
     public Lista() {
         this.primeiro = null;
     }
 
+    public Lista(PacienteFila primeiro) {
+        this.primeiro = primeiro;
+    }
+
+    public PacienteFila getPrimeiro() {
+        return primeiro;
+    }
+
+    public void setPrimeiro(PacienteFila primeiro) {
+        this.primeiro = primeiro;
+    }
+
     public void inserePaciente(Paciente paciente) {
 
-    	if (buscarPaciente(paciente.getNome()) != null) {
+        if (buscarPaciente(paciente.getNome()) != null) {
             System.out.println("Paciente com o mesmo nome já existe na fila.");
             return;
         }
@@ -33,8 +47,8 @@ public class Lista {
         // Percorrer a lista para encontrar a posição correta
         PacienteFila atual = primeiro;
 
-        while (atual.getProximo() != null && 
-              (!paciente.isPreferencial() || atual.getProximo().getValor().isPreferencial())) {
+        while (atual.getProximo() != null &&
+                (!paciente.isPreferencial() || atual.getProximo().getValor().isPreferencial())) {
             atual = atual.getProximo();
         }
 

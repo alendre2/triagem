@@ -52,12 +52,13 @@ public class PacienteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PacienteResponseDto>> listarPacientes(@RequestParam(value = "nome", required = false) String nome) {
-        if (nome != null && !nome.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(pacienteService.buscarPacientePorNome(nome));
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body(pacienteService.listarPacientes());
-        }
+    public ResponseEntity<List<PacienteResponseDto>> listarPacientes() {
+        return ResponseEntity.ok().body(pacienteService.listarPacientes());
+    }
+
+    @GetMapping(value = "/listar_por_nome")
+    public ResponseEntity<List<PacienteResponseDto>> listarPorNome(@RequestParam(value = "nome", required = false) String nome) {
+        return ResponseEntity.ok().body(pacienteService.listarPorNome(nome));
     }
 
     @GetMapping("/triagem")

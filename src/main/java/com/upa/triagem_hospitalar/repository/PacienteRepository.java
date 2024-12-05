@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
-    @Query("SELECT p FROM Paciente p WHERE LOWER(u.nome) LIKE LOWER(CONCAT('%', :nome, '%'))")
+    @Query("SELECT p FROM Paciente p WHERE LOWER(p.nome) LIKE LOWER(CONCAT('%', :nome, '%'))")
     List<Paciente> findByNome(@Param("nome") String nome);
 
     boolean existsByNome(String nome);

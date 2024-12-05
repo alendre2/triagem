@@ -70,19 +70,12 @@ public class PacienteService {
     }
 
 
-    public List<PacienteResponseDto> buscarPacientePorNome(String nome) {
+    public List<PacienteResponseDto> listarPorNome(String nome) {
         return mapStruct.converterListParaResponseDto(repository.findByNome(nome));
     }
 
     public List<PacienteResponseDto> listarFila() {
         return mapStruct.converterListParaResponseDto(filaTriagem.toList());
-    }
-
-    //Metodo auxiliar
-    public void verificarSePacienteExiste(Paciente paciente) {
-        if (repository.existsByNome(paciente.getNome())) {
-            throw new PacienteJaExisteException("Já existe um paciente com o nome " + paciente.getNome());
-        }
     }
 
     // Chamar o próximo paciente da fila de triagem
@@ -92,5 +85,12 @@ public class PacienteService {
             throw new FilaDeAtendimentoVaziaException("Fila de atendimento vazia.");
         }
         return mapStruct.converterParaResponseDto(proximo);
+    }
+
+    //Metodo auxiliar
+    public void verificarSePacienteExiste(Paciente paciente) {
+        if (repository.existsByNome(paciente.getNome())) {
+            throw new PacienteJaExisteException("Já existe um paciente com o nome " + paciente.getNome());
+        }
     }
 }
