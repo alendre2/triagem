@@ -3,7 +3,6 @@ package com.upa.triagem_hospitalar.controller.handlerException;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
-import java.util.Locale;
 
 public class PadraoDeErro {
 

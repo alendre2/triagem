@@ -1,4 +1,3 @@
-// PacienteRepository.java
 package com.upa.triagem_hospitalar.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,8 +13,8 @@ import java.util.List;
 @Repository
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
-    @Query("SELECT u FROM Paciente u WHERE LOWER(u.nome) LIKE LOWER(CONCAT('%', :nome, '%'))")
-    List<Paciente> findByNomeContainingIgnoreCase(@Param("nome")String nome);
+    @Query("SELECT p FROM Paciente p WHERE LOWER(u.nome) LIKE LOWER(CONCAT('%', :nome, '%'))")
+    List<Paciente> findByNome(@Param("nome") String nome);
 
     boolean existsByNome(String nome);
 }

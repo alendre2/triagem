@@ -1,33 +1,30 @@
 package com.upa.triagem_hospitalar.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.upa.triagem_hospitalar.dto.requestDto.PacienteRequestDto;
 import com.upa.triagem_hospitalar.dto.responseDto.PacienteResponseDto;
-import com.upa.triagem_hospitalar.exception.PacienteJaExisteException;
-import com.upa.triagem_hospitalar.fila.PacienteFila;
-import com.upa.triagem_hospitalar.mapStruct.PacienteMapStruct;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.upa.triagem_hospitalar.entity.Paciente;
 import com.upa.triagem_hospitalar.exception.FilaDeAtendimentoVaziaException;
+import com.upa.triagem_hospitalar.exception.PacienteJaExisteException;
 import com.upa.triagem_hospitalar.exception.PacienteNaoEncontradoException;
-import com.upa.triagem_hospitalar.fila.Lista; // A lista personalizada
+import com.upa.triagem_hospitalar.fila.Lista;
+import com.upa.triagem_hospitalar.mapStruct.PacienteMapStruct;
 import com.upa.triagem_hospitalar.repository.PacienteRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PacienteService {
 
     private final PacienteRepository pacienteRepository;
     private final PacienteMapStruct mapStruct;
-    private final Lista filaTriagem = new Lista();
+    private final Lista filaTriagem;
 
-    public PacienteService(PacienteRepository pacienteRepository, PacienteMapStruct mapStruct) {
+    public PacienteService(PacienteRepository pacienteRepository, PacienteMapStruct mapStruct, Lista filaTriagem) {
         this.pacienteRepository = pacienteRepository;
         this.mapStruct = mapStruct;
+        this.filaTriagem = filaTriagem;
     }
 
 
@@ -37,7 +34,7 @@ public class PacienteService {
 
         boolean existePaciente = pacienteRepository.existsByNome(paciente.getNome());
 
-        if(existePaciente){
+        if (existePaciente) {
             throw new PacienteJaExisteException("Já existe um paciente com o nome " + paciente.getNome());
         }
         pacienteRepository.save(paciente);
@@ -49,7 +46,7 @@ public class PacienteService {
     @Transactional
     public PacienteResponseDto atualizarPaciente(Long id, PacienteRequestDto pacienteRequestDto) {
         return pacienteRepository.findById(id)
-                .map(paciente ->{
+                .map(paciente -> {
                     String nomeAntigo = paciente.getNome();
                     paciente.setNome(pacienteRequestDto.nome());
                     paciente.setPreferencial(pacienteRequestDto.preferencial());
@@ -59,20 +56,20 @@ public class PacienteService {
                     filaTriagem.atualizarPaciente(mapStruct.converterDtoParaPaciente(pacienteRequestDto).getNome(), paciente);
 
                     return mapStruct.converterParaResponseDto(pacienteAtualizado);
-                }).orElseThrow(() -> new PacienteNaoEncontradoException("Não foi possivel atualizar, paciente não identificado. Id"+ id  ));
+                }).orElseThrow(() -> new PacienteNaoEncontradoException("Não foi possivel atualizar, paciente não identificado. Id" + id));
     }
 
     @Transactional
     public void deletarPaciente(long id) {
-        Paciente paciente = pacienteRepository.findById(id).orElseThrow(()->
-                new PacienteNaoEncontradoException("Não foi possivel deletar! Paciente não identificado. Id"+ id  ));
+        Paciente paciente = pacienteRepository.findById(id).orElseThrow(() ->
+                new PacienteNaoEncontradoException("Não foi possivel deletar! Paciente não identificado. Id" + id));
         filaTriagem.removerPaciente(paciente.getNome());
         pacienteRepository.deleteById(id);
     }
 
     public PacienteResponseDto buscarPacientePorId(Long id) {
         Paciente paciente = pacienteRepository.findById(id)
-                .orElseThrow(() -> new PacienteNaoEncontradoException("Paciente não encontrado. Id"+ id  ));
+                .orElseThrow(() -> new PacienteNaoEncontradoException("Paciente não encontrado. Id" + id));
         return mapStruct.converterParaResponseDto(paciente);
     }
 
@@ -82,10 +79,10 @@ public class PacienteService {
 
 
     public List<PacienteResponseDto> buscarPacientePorNome(String nome) {
-        return mapStruct.converterListParaResponseDto(pacienteRepository.findByNomeContainingIgnoreCase(nome));
+        return mapStruct.converterListParaResponseDto(pacienteRepository.findByNome(nome));
     }
 
-    public List<PacienteResponseDto> listarFila(){
+    public List<PacienteResponseDto> listarFila() {
         return mapStruct.converterListParaResponseDto(filaTriagem.toList());
     }
 

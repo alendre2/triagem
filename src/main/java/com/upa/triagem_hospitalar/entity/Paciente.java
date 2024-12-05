@@ -5,46 +5,65 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
-public class Paciente {
+@Table(name = "tb_paciente")
+public class Paciente implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-		@Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(nullable = false)
+    private String nome;
 
+    @Column(nullable = false)
+    private boolean preferencial;
 
-		@Column
-	    private String nome;
-		
-		@Column
-	    private boolean preferencial;
+    public Paciente() {
+    }
 
-		public String getNome() {
-			return nome;
-		}
+    public Paciente(String nome, boolean preferencial) {
+        this.nome = nome;
+        this.preferencial = preferencial;
+    }
 
-		public void setNome(String nome) {
-			this.nome = nome;
-		}
+    public String getNome() {
+        return nome;
+    }
 
-		public boolean isPreferencial() {
-			return preferencial;
-		}
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-		public void setPreferencial(boolean preferencial) {
-			this.preferencial = preferencial;
-		}
+    public boolean isPreferencial() {
+        return preferencial;
+    }
 
-		public Long getId() {
-			return id;
-		}
+    public void setPreferencial(boolean preferencial) {
+        this.preferencial = preferencial;
+    }
 
-		public void setId(Long id) {
-			this.id = id;
-		}
-		
-		
-		
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Paciente paciente = (Paciente) o;
+        return Objects.equals(id, paciente.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
